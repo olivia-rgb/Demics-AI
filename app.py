@@ -16,30 +16,31 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Enhanced Custom CSS with beautiful styling
+# Refined Custom CSS with clean blue theme
 st.markdown("""
 <style>
     /* Import Google Fonts */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Poppins:wght@600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Alan+Sans:wght@300;400;600;700&family=Inter:wght@400;500;600;700&display=swap');
     
     /* Global Styles */
     * {
-        font-family: 'Inter', sans-serif;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     }
     
     h1, h2, h3 {
-        font-family: 'Poppins', sans-serif;
+        font-family: 'Inter', sans-serif;
         font-weight: 700;
+        color: #1565C0;
     }
     
     /* Main container */
     .main {
-        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        background: #f5f7fa;
     }
     
     /* Sidebar styling */
     [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #1e3c72 0%, #2a5298 100%);
+        background: #1565C0;
     }
     
     [data-testid="stSidebar"] * {
@@ -50,22 +51,22 @@ st.markdown("""
     .metric-card {
         background: white;
         padding: 25px;
-        border-radius: 15px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07), 0 1px 3px rgba(0, 0, 0, 0.06);
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(21, 101, 192, 0.1);
         margin: 15px 0;
         transition: transform 0.3s ease, box-shadow 0.3s ease;
-        border-left: 4px solid #4CAF50;
+        border-left: 4px solid #1565C0;
     }
     
     .metric-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+        transform: translateY(-3px);
+        box-shadow: 0 4px 16px rgba(21, 101, 192, 0.2);
     }
     
     .metric-value {
         font-size: 2.5rem;
         font-weight: 700;
-        color: #1e3c72;
+        color: #1565C0;
         margin: 10px 0;
     }
     
@@ -73,58 +74,52 @@ st.markdown("""
         font-size: 0.9rem;
         color: #666;
         text-transform: uppercase;
-        letter-spacing: 1px;
+        letter-spacing: 0.5px;
         font-weight: 600;
     }
     
     .metric-delta {
         font-size: 0.85rem;
-        color: #4CAF50;
+        color: #1565C0;
         font-weight: 600;
     }
     
     /* Alert cards */
     .alert-critical {
-        background: linear-gradient(135deg, #ff4b4b 0%, #d32f2f 100%);
+        background: #d32f2f;
         color: white;
-        padding: 20px;
+        padding: 25px;
         border-radius: 12px;
         margin: 20px 0;
-        box-shadow: 0 8px 16px rgba(255, 75, 75, 0.3);
-        animation: pulse 2s infinite;
-    }
-    
-    @keyframes pulse {
-        0%, 100% { box-shadow: 0 8px 16px rgba(255, 75, 75, 0.3); }
-        50% { box-shadow: 0 8px 24px rgba(255, 75, 75, 0.5); }
+        box-shadow: 0 4px 12px rgba(211, 47, 47, 0.3);
     }
     
     .alert-high {
-        background: linear-gradient(135deg, #ffa726 0%, #ff9800 100%);
+        background: #f57c00;
         color: white;
-        padding: 20px;
+        padding: 25px;
         border-radius: 12px;
         margin: 20px 0;
-        box-shadow: 0 8px 16px rgba(255, 152, 0, 0.3);
+        box-shadow: 0 4px 12px rgba(245, 124, 0, 0.3);
     }
     
     .alert-normal {
-        background: linear-gradient(135deg, #66bb6a 0%, #4caf50 100%);
+        background: #1565C0;
         color: white;
-        padding: 20px;
+        padding: 25px;
         border-radius: 12px;
         margin: 20px 0;
-        box-shadow: 0 8px 16px rgba(76, 175, 80, 0.3);
+        box-shadow: 0 4px 12px rgba(21, 101, 192, 0.3);
     }
     
     /* Info cards */
     .info-card {
         background: white;
-        padding: 20px;
+        padding: 25px;
         border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        box-shadow: 0 2px 8px rgba(21, 101, 192, 0.1);
         margin: 15px 0;
-        border-left: 4px solid #2196F3;
+        border-left: 4px solid #1565C0;
     }
     
     /* Hotspot card */
@@ -132,14 +127,14 @@ st.markdown("""
         background: white;
         padding: 20px;
         border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        box-shadow: 0 2px 8px rgba(21, 101, 192, 0.1);
         margin: 10px 0;
-        border-left: 4px solid #ff5722;
+        border-left: 4px solid #d32f2f;
         transition: all 0.3s ease;
     }
     
     .hotspot-card:hover {
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+        box-shadow: 0 4px 16px rgba(21, 101, 192, 0.2);
         transform: translateX(5px);
     }
     
@@ -159,13 +154,13 @@ st.markdown("""
     .stNumberInput > div > div > input:focus,
     .stSelectbox > div > div > select:focus,
     .stTextArea > div > div > textarea:focus {
-        border-color: #2196F3;
-        box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+        border-color: #1565C0;
+        box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.1);
     }
     
     /* Button styling */
     .stButton > button {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: #1565C0;
         color: white;
         border: none;
         padding: 12px 30px;
@@ -174,49 +169,41 @@ st.markdown("""
         font-size: 1rem;
         cursor: pointer;
         transition: all 0.3s ease;
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        box-shadow: 0 2px 8px rgba(21, 101, 192, 0.3);
     }
     
     .stButton > button:hover {
+        background: #0d47a1;
         transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(102, 126, 234, 0.6);
+        box-shadow: 0 4px 12px rgba(21, 101, 192, 0.4);
     }
     
     /* Header styling */
     .main-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: white;
         padding: 30px;
-        border-radius: 15px;
-        color: white;
+        border-radius: 12px;
         margin-bottom: 30px;
-        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        box-shadow: 0 2px 8px rgba(21, 101, 192, 0.1);
     }
     
     .main-header h1 {
         margin: 0;
         font-size: 2.5rem;
-        color: white;
+        color: #1565C0;
     }
     
     .main-header p {
         margin: 10px 0 0 0;
-        opacity: 0.9;
+        color: #666;
         font-size: 1.1rem;
-    }
-    
-    /* Stats grid */
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 20px;
-        margin: 20px 0;
     }
     
     /* Data table styling */
     .dataframe {
         border-radius: 8px;
         overflow: hidden;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        box-shadow: 0 2px 8px rgba(21, 101, 192, 0.1);
     }
     
     /* Badge styling */
@@ -229,26 +216,26 @@ st.markdown("""
         margin: 5px;
     }
     
-    .badge-critical { background: #ff4b4b; color: white; }
-    .badge-high { background: #ffa726; color: white; }
-    .badge-moderate { background: #ffeb3b; color: #333; }
-    .badge-low { background: #66bb6a; color: white; }
+    .badge-critical { background: #d32f2f; color: white; }
+    .badge-high { background: #f57c00; color: white; }
+    .badge-moderate { background: #ffa726; color: white; }
+    .badge-low { background: #1565C0; color: white; }
     
     /* Loading spinner */
     .stSpinner > div {
-        border-color: #667eea !important;
+        border-color: #1565C0 !important;
     }
     
     /* Success/Error messages */
     .stSuccess {
-        background-color: #e8f5e9;
-        border-left: 4px solid #4caf50;
+        background-color: #e3f2fd;
+        border-left: 4px solid #1565C0;
         border-radius: 8px;
     }
     
     .stError {
         background-color: #ffebee;
-        border-left: 4px solid #f44336;
+        border-left: 4px solid #d32f2f;
         border-radius: 8px;
     }
     
@@ -258,6 +245,12 @@ st.markdown("""
         border-radius: 8px;
         border: 1px solid #e0e0e0;
     }
+    
+    /* Custom subheader styling */
+    .info-card h2, .info-card h3 {
+        color: #1565C0;
+        margin-top: 0;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -266,7 +259,7 @@ st.sidebar.markdown("""
 <div style='text-align: center; padding: 20px;'>
     <h1 style='color: white; margin: 0;'>🏥</h1>
     <h2 style='color: white; margin: 10px 0;'>DemicsTech</h2>
-    <p style='color: rgba(255,255,255,0.8); font-size: 0.9rem;'>Disease Surveillance & Outbreak Detection</p>
+    <p style='color: rgba(255,255,255,0.9); font-size: 0.9rem;'>Disease Surveillance & Outbreak Detection</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -286,14 +279,14 @@ if disease_type == "Other":
 st.sidebar.markdown("---")
 st.sidebar.markdown("""
 <div style='text-align: center; padding: 10px;'>
-    <p style='font-size: 0.8rem; color: rgba(255,255,255,0.6);'>Version 1.0</p>
-    <p style='font-size: 0.75rem; color: rgba(255,255,255,0.5);'>Real-time Disease Monitoring</p>
+    <p style='font-size: 0.8rem; color: rgba(255,255,255,0.8);'>Version 1.0</p>
+    <p style='font-size: 0.75rem; color: rgba(255,255,255,0.7);'>Real-time Disease Monitoring</p>
 </div>
 """, unsafe_allow_html=True)
 
 
 def create_metric_card(label, value, delta=None, icon="📊"):
-    """Create a beautiful metric card"""
+    """Create a clean metric card"""
     delta_html = f"<div class='metric-delta'>↑ {delta}</div>" if delta else ""
     
     return f"""
@@ -310,7 +303,7 @@ def create_metric_card(label, value, delta=None, icon="📊"):
 
 
 def show_dashboard():
-    """Enhanced dashboard with beautiful visualizations"""
+    """Clean dashboard with refined visualizations"""
     st.markdown(f"""
     <div class='main-header'>
         <h1>📊 {disease_type} Surveillance Dashboard</h1>
@@ -329,7 +322,7 @@ def show_dashboard():
             monthly = data.get('monthly_statistics', {})
             outbreak = data.get('outbreak_status', {})
             
-            # Key Metrics with beautiful cards
+            # Key Metrics
             col1, col2, col3, col4 = st.columns(4)
             
             with col1:
@@ -362,9 +355,7 @@ def show_dashboard():
             if outbreak.get('is_outbreak'):
                 st.markdown(f"""
                 <div class="alert-critical">
-                    <h3 style='margin: 0; display: flex; align-items: center;'>
-                        🚨 OUTBREAK ALERT
-                    </h3>
+                    <h3 style='margin: 0; color: white;'>🚨 OUTBREAK ALERT</h3>
                     <p style='margin: 10px 0 0 0; font-size: 1.1rem;'>
                         {disease_type} cases have increased by <strong>{outbreak.get('increase_factor', 0)}x</strong> in the last 7 days.
                     </p>
@@ -376,7 +367,7 @@ def show_dashboard():
             else:
                 st.markdown(f"""
                 <div class="alert-normal">
-                    <h3 style='margin: 0;'>✅ Normal Status</h3>
+                    <h3 style='margin: 0; color: white;'>✅ Normal Status</h3>
                     <p style='margin: 10px 0 0 0;'>No outbreak detected. Situation is under control.</p>
                 </div>
                 """, unsafe_allow_html=True)
@@ -397,9 +388,9 @@ def show_dashboard():
                         y=df['positive_cases'],
                         mode='lines+markers',
                         name='Positive Cases',
-                        line=dict(color='#667eea', width=3),
+                        line=dict(color='#1565C0', width=3),
                         fill='tozeroy',
-                        fillcolor='rgba(102, 126, 234, 0.1)'
+                        fillcolor='rgba(21, 101, 192, 0.1)'
                     ))
                     
                     fig.update_layout(
@@ -429,7 +420,7 @@ def show_dashboard():
                         y='address',
                         orientation='h',
                         color='positive_count',
-                        color_continuous_scale='Reds'
+                        color_continuous_scale=['#e3f2fd', '#1565C0']
                     )
                     
                     fig.update_layout(
@@ -461,7 +452,7 @@ def show_dashboard():
                     
                     st.markdown(f"""
                     <div class='hotspot-card'>
-                        <h4 style='margin: 0; color: #1e3c72;'>
+                        <h4 style='margin: 0; color: #1565C0;'>
                             {risk_color} Hotspot {i}: {hotspot['location']}
                         </h4>
                         <div style='margin-top: 10px; display: flex; gap: 20px;'>
@@ -484,7 +475,7 @@ def show_dashboard():
 
 
 def add_test_result_form():
-    """Enhanced form for adding test results"""
+    """Form for adding test results"""
     st.markdown("""
     <div class='main-header'>
         <h1>➕ Add New Test Result</h1>
@@ -549,7 +540,7 @@ def add_test_result_form():
 
 
 def add_hospital_form():
-    """Enhanced form for adding hospitals"""
+    """Form for adding hospitals"""
     st.markdown("""
     <div class='main-header'>
         <h1>🏥 Register New Hospital</h1>
@@ -596,7 +587,7 @@ def add_hospital_form():
 
 
 def view_cases():
-    """Enhanced case viewing"""
+    """Case viewing interface"""
     st.markdown(f"""
     <div class='main-header'>
         <h1>📋 {disease_type} Case Records</h1>
@@ -635,7 +626,6 @@ def view_cases():
                     df = pd.DataFrame(cases)
                     st.dataframe(df, use_container_width=True, height=400)
                     
-                    # Download option
                     csv = df.to_csv(index=False)
                     st.download_button(
                         "📥 Download CSV",
@@ -652,7 +642,7 @@ def view_cases():
 
 
 def hotspot_analysis():
-    """Enhanced hotspot analysis"""
+    """Hotspot analysis interface"""
     st.markdown("""
     <div class='main-header'>
         <h1>🔥 Hotspot Analysis</h1>
@@ -710,7 +700,7 @@ def hotspot_analysis():
 
 
 def outbreak_detection():
-    """Enhanced outbreak detection"""
+    """Outbreak detection interface"""
     st.markdown("""
     <div class='main-header'>
         <h1>⚠️ Outbreak Detection</h1>
@@ -743,7 +733,7 @@ def outbreak_detection():
                 if result['is_outbreak']:
                     st.markdown(f"""
                     <div class='alert-critical'>
-                        <h2 style='margin: 0;'>🚨 OUTBREAK DETECTED</h2>
+                        <h2 style='margin: 0; color: white;'>🚨 OUTBREAK DETECTED</h2>
                         <div style='margin-top: 20px; font-size: 1.1rem;'>
                             <p><strong>Recent cases ({days_window} days):</strong> {result['recent_cases']}</p>
                             <p><strong>Historical average:</strong> {result['historical_avg']}</p>
@@ -755,7 +745,7 @@ def outbreak_detection():
                 else:
                     st.markdown(f"""
                     <div class='alert-normal'>
-                        <h2 style='margin: 0;'>✅ No Outbreak Detected</h2>
+                        <h2 style='margin: 0; color: white;'>✅ No Outbreak Detected</h2>
                         <div style='margin-top: 20px; font-size: 1.1rem;'>
                             <p><strong>Recent cases ({days_window} days):</strong> {result['recent_cases']}</p>
                             <p><strong>Historical average:</strong> {result['historical_avg']}</p>
