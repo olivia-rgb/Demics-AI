@@ -237,9 +237,10 @@ def example_add_malaria_case():
 
 
 if __name__ == "__main__":
-    # Test the ingestion system
-    example_add_malaria_case()
-    
+    if os.environ.get("RUN_DEMO_DATA") == "true":
+        example_add_malaria_case()
+        print("🦟 Demo malaria data added")
+
     # Retrieve November cases
     ingestion = DataIngestion()
     cases = ingestion.get_monthly_cases('Malaria', 11, 2024)

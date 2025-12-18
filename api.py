@@ -199,8 +199,13 @@ def get_dashboard_data():
 
 
 if __name__ == '__main__':
+    import os
+    
+    # Get port from environment variable (for Render deployment)
+    port = int(os.environ.get('PORT', 5000))
+    
     print("🚀 Starting DemicsTech API Server...")
-    print("📍 API will be available at: http://localhost:5000")
+    print(f"📍 API will be available at: http://localhost:{port}")
     print("\n📚 Available Endpoints:")
     print("  POST   /api/hospitals")
     print("  GET    /api/hospitals")
@@ -214,4 +219,5 @@ if __name__ == '__main__':
     print("  GET    /api/dashboard")
     print("\n✅ Server starting...\n")
     
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    # Use 0.0.0.0 to allow external connections
+    app.run(debug=False, host='0.0.0.0', port=port)

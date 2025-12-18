@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 import json
 
 # Configuration
-API_URL = "http://localhost:5000"
+API_URL = "https://demics-ai-1.onrender.com"
 
 st.set_page_config(
     page_title="DemicsTech - Disease Surveillance System",
