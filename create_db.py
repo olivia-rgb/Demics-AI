@@ -1,11 +1,19 @@
 import sqlite3 
 from datetime import datetime
-import json
+import os
 
-def create_database():
+def create_database(db_path='demicstech.db'):
     """Create the DemicsTech surveillance database with all necessary tables"""
-    conn = sqlite3.connect('demicstech.db')
+    
+    # Create directory if it doesn't exist
+    db_dir = os.path.dirname(db_path)
+    if db_dir and not os.path.exists(db_dir):
+        os.makedirs(db_dir)
+    
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
+    
+    print("🔧 Creating database tables...")
     
     # Hospitals/Data Sources Table
     cursor.execute('''
@@ -107,21 +115,28 @@ def create_database():
     )
     ''')
     
-    # Create indexes
+    # Create indexes for better query performance
     cursor.execute('CREATE INDEX IF NOT EXISTS idx_test_date ON test_results(test_date)')
     cursor.execute('CREATE INDEX IF NOT EXISTS idx_disease_type ON test_results(disease_type)')
     cursor.execute('CREATE INDEX IF NOT EXISTS idx_patient_hospital ON patients(hospital_id)')
     cursor.execute('CREATE INDEX IF NOT EXISTS idx_alert_date ON outbreak_alerts(alert_date)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_test_result ON test_results(test_result)')
     
     conn.commit()
     
-    # Optional test hospital
-    cursor.execute('''
-    INSERT OR IGNORE INTO hospitals (hospital_name, location, latitude, longitude, contact_email)
-    VALUES (?, ?, ?, ?, ?)
-    ''', ('National Hospital Abuja', 'Central District, Abuja', 9.0579, 7.4951, 'contact@nationalhospital.ng'))
+    # Check if we need to add sample hospital
+    cursor.execute('SELECT COUNT(*) as count FROM hospitals')
+    hospital_count = cursor.fetchone()[0]
     
-    conn.commit()
+    if hospital_count == 0:
+        print("📍 Adding default hospital...")
+        cursor.execute('''
+        INSERT INTO hospitals (hospital_name, location, latitude, longitude, contact_email)
+        VALUES (?, ?, ?, ?, ?)
+        ''', ('National Hospital Abuja', 'Central District, Abuja', 9.0579, 7.4951, 'contact@nationalhospital.ng'))
+        conn.commit()
+        print("✅ Default hospital added")
+    
     conn.close()
     
     print("✅ Database created successfully!")
@@ -132,10 +147,16 @@ def create_database():
     print("   - hotspot_analysis")
     print("   - daily_statistics")
     print("   - outbreak_alerts")
+    
+    return True
 
-def view_database_stats():
+def view_database_stats(db_path='demicstech.db'):
     """View current database statistics"""
-    conn = sqlite3.connect('demicstech.db')
+    if not os.path.exists(db_path):
+        print("❌ Database does not exist. Run create_database() first.")
+        return
+    
+    conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     
@@ -144,11 +165,29 @@ def view_database_stats():
     
     tables = ['hospitals', 'patients', 'test_results', 'hotspot_analysis', 'daily_statistics', 'outbreak_alerts']
     for table in tables:
-        cursor.execute(f'SELECT COUNT(*) as count FROM {table}')
-        count = cursor.fetchone()['count']
-        print(f"{table.capitalize()}: {count} records")
+        try:
+            cursor.execute(f'SELECT COUNT(*) as count FROM {table}')
+            count = cursor.fetchone()['count']
+            print(f"{table.capitalize()}: {count} records")
+        except Exception as e:
+            print(f"{table.capitalize()}: Error - {str(e)}")
     
     conn.close()
+
+def check_database_exists(db_path='demicstech.db'):
+    """Check if database exists and has tables"""
+    if not os.path.exists(db_path):
+        return False
+    
+    try:
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='hospitals'")
+        result = cursor.fetchone()
+        conn.close()
+        return result is not None
+    except Exception:
+        return False
 
 if __name__ == "__main__":
     create_database()

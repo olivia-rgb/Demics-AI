@@ -1,24 +1,75 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from datetime import datetime
+from datetime import datetime, timedelta
 import sys
 import os
 
 # Import our modules
 from data_ingestion import DataIngestion
 from analysis import DiseaseAnalyzer
+from database import create_database, check_database_exists
 
 app = Flask(__name__)
 CORS(app)
 
-ingestion = DataIngestion()
-analyzer = DiseaseAnalyzer()
+# Initialize database on startup
+DB_PATH = os.environ.get('DATABASE_PATH', 'demicstech.db')
+
+print("🔍 Checking database...")
+if not check_database_exists(DB_PATH):
+    print("📦 Database not found. Creating new database...")
+    create_database(DB_PATH)
+    print("✅ Database initialized successfully!")
+else:
+    print("✅ Database found and ready!")
+
+# Initialize services
+ingestion = DataIngestion(db_path=DB_PATH)
+analyzer = DiseaseAnalyzer(db_path=DB_PATH)
+
+
+@app.route('/', methods=['GET'])
+def home():
+    """Root endpoint"""
+    return jsonify({
+        'service': 'DemicsTech API',
+        'version': '1.0.0',
+        'status': 'running',
+        'endpoints': {
+            'health': '/health',
+            'hospitals': '/api/hospitals',
+            'test_results': '/api/test-results',
+            'statistics': '/api/statistics',
+            'hotspots': '/api/hotspots',
+            'outbreak': '/api/outbreak/detect',
+            'dashboard': '/api/dashboard'
+        }
+    }), 200
 
 
 @app.route('/health', methods=['GET'])
 def health_check():
     """Health check endpoint"""
-    return jsonify({'status': 'healthy', 'service': 'DemicsTech API'}), 200
+    try:
+        # Test database connection
+        conn = ingestion.get_connection()
+        cursor = conn.cursor()
+        cursor.execute('SELECT COUNT(*) FROM hospitals')
+        hospital_count = cursor.fetchone()[0]
+        conn.close()
+        
+        return jsonify({
+            'status': 'healthy',
+            'service': 'DemicsTech API',
+            'database': 'connected',
+            'hospitals_registered': hospital_count
+        }), 200
+    except Exception as e:
+        return jsonify({
+            'status': 'unhealthy',
+            'service': 'DemicsTech API',
+            'error': str(e)
+        }), 500
 
 
 @app.route('/api/hospitals', methods=['POST'])
@@ -26,6 +77,14 @@ def add_hospital():
     """Add a new hospital to the system"""
     try:
         data = request.json
+        
+        # Validate required fields
+        if not data.get('hospital_name') or not data.get('location'):
+            return jsonify({
+                'success': False,
+                'error': 'hospital_name and location are required'
+            }), 400
+        
         hospital_id = ingestion.add_hospital(data)
         return jsonify({
             'success': True,
@@ -55,6 +114,16 @@ def add_test_result():
     """Add a new test result"""
     try:
         data = request.json
+        
+        # Validate required fields
+        required_fields = ['hospital_id', 'disease_type', 'test_result', 'test_date', 'patient_data']
+        for field in required_fields:
+            if field not in data:
+                return jsonify({
+                    'success': False,
+                    'error': f'Missing required field: {field}'
+                }), 400
+        
         result_id = ingestion.add_test_result(data)
         return jsonify({
             'success': True,
@@ -70,7 +139,15 @@ def bulk_add_test_results():
     """Add multiple test results at once"""
     try:
         data = request.json
-        count = ingestion.bulk_add_test_results(data.get('results', []))
+        results = data.get('results', [])
+        
+        if not results:
+            return jsonify({
+                'success': False,
+                'error': 'No results provided'
+            }), 400
+        
+        count = ingestion.bulk_add_test_results(results)
         return jsonify({
             'success': True,
             'count': count,
@@ -119,7 +196,6 @@ def get_hotspots():
         
         if not start_date:
             # Default to last 30 days
-            from datetime import timedelta
             start_date = str(datetime.now().date() - timedelta(days=30))
         
         hotspots = analyzer.detect_hotspots(disease_type, start_date, end_date, radius_km, min_cases)
@@ -179,7 +255,6 @@ def get_dashboard_data():
         monthly_stats = analyzer.generate_monthly_statistics(disease_type, month, year)
         outbreak_status = analyzer.detect_outbreak(disease_type)
         
-        from datetime import timedelta
         start_date = str(datetime.now().date() - timedelta(days=30))
         hotspots = analyzer.detect_hotspots(disease_type, start_date, today)
         
@@ -198,26 +273,50 @@ def get_dashboard_data():
         return jsonify({'success': False, 'error': str(e)}), 400
 
 
+# Error handlers
+@app.errorhandler(404)
+def not_found(error):
+    return jsonify({
+        'success': False,
+        'error': 'Endpoint not found',
+        'message': 'The requested endpoint does not exist'
+    }), 404
+
+
+@app.errorhandler(500)
+def internal_error(error):
+    return jsonify({
+        'success': False,
+        'error': 'Internal server error',
+        'message': 'An unexpected error occurred'
+    }), 500
+
+
 if __name__ == '__main__':
-    import os
-    
     # Get port from environment variable (for Render deployment)
     port = int(os.environ.get('PORT', 5000))
     
-    print("🚀 Starting DemicsTech API Server...")
-    print(f"📍 API will be available at: http://localhost:{port}")
+    print("\n" + "="*60)
+    print("🚀 DemicsTech API Server Starting...")
+    print("="*60)
+    print(f"📍 Server URL: http://0.0.0.0:{port}")
+    print(f"💾 Database: {DB_PATH}")
     print("\n📚 Available Endpoints:")
-    print("  POST   /api/hospitals")
-    print("  GET    /api/hospitals")
-    print("  POST   /api/test-results")
-    print("  POST   /api/test-results/bulk")
-    print("  GET    /api/statistics/daily")
-    print("  GET    /api/statistics/monthly")
-    print("  GET    /api/hotspots")
-    print("  GET    /api/outbreak/detect")
-    print("  GET    /api/cases")
-    print("  GET    /api/dashboard")
-    print("\n✅ Server starting...\n")
+    print("  GET    /              - API information")
+    print("  GET    /health        - Health check")
+    print("  POST   /api/hospitals - Add hospital")
+    print("  GET    /api/hospitals - Get all hospitals")
+    print("  POST   /api/test-results - Add test result")
+    print("  POST   /api/test-results/bulk - Bulk add test results")
+    print("  GET    /api/statistics/daily - Daily statistics")
+    print("  GET    /api/statistics/monthly - Monthly statistics")
+    print("  GET    /api/hotspots - Detect hotspots")
+    print("  GET    /api/outbreak/detect - Detect outbreak")
+    print("  GET    /api/cases - Get cases")
+    print("  GET    /api/dashboard - Dashboard data")
+    print("="*60)
+    print("✅ Server ready!\n")
     
-    # Use 0.0.0.0 to allow external connections
+    # Run the app
+    # Use debug=False for production on Render
     app.run(debug=False, host='0.0.0.0', port=port)
