@@ -7,7 +7,7 @@ import os
 # Import our modules
 from data_ingestion import DataIngestion
 from analysis import DiseaseAnalyzer
-from database import create_database, check_database_exists
+from create_db import create_database, check_database_exists
 
 app = Flask(__name__)
 CORS(app)
